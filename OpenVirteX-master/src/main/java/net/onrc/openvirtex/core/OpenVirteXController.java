@@ -35,7 +35,6 @@ import net.onrc.openvirtex.exceptions.NetworkMappingException;
 import net.onrc.openvirtex.util.BitSetIndex;
 import net.onrc.openvirtex.util.BitSetIndex.IndexType;
 
-import net.onrc.openvirtex.util.GlobalStatsManager;
 import net.onrc.openvirtex.util.StatManagerTest;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
