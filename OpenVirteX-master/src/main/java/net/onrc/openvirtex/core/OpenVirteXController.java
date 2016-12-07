@@ -21,6 +21,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import jdk.nashorn.internal.objects.Global;
 import net.onrc.openvirtex.api.server.JettyServer;
 import net.onrc.openvirtex.core.cmd.CmdLineSettings;
 import net.onrc.openvirtex.core.io.ClientChannelPipeline;
@@ -34,6 +35,8 @@ import net.onrc.openvirtex.exceptions.NetworkMappingException;
 import net.onrc.openvirtex.util.BitSetIndex;
 import net.onrc.openvirtex.util.BitSetIndex.IndexType;
 
+import net.onrc.openvirtex.util.GlobalStatsManager;
+import net.onrc.openvirtex.util.StatManagerTest;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jboss.netty.bootstrap.ClientBootstrap;
@@ -88,6 +91,8 @@ public class OpenVirteXController implements Runnable {
 
     private final Boolean useBDDP;
 
+//    private StatManagerTest statManagerTest = null;
+
     public OpenVirteXController(CmdLineSettings settings) {
         this.ofHost = settings.getOFHost();
         this.ofPort = settings.getOFPort();
@@ -109,6 +114,8 @@ public class OpenVirteXController implements Runnable {
         OpenVirteXController.instance = this;
         OpenVirteXController.tenantIdCounter = new BitSetIndex(
                 IndexType.TENANT_ID);
+
+//        this.statManagerTest = new StatManagerTest();
     }
 
     @Override
@@ -135,7 +142,7 @@ public class OpenVirteXController implements Runnable {
         } catch (final Exception e) {
             throw new RuntimeException(e);
         }
-
+//        this.statManagerTest.run();
     }
 
     public void addControllers(final OVXSwitch sw, final Set<String> ctrls) {
