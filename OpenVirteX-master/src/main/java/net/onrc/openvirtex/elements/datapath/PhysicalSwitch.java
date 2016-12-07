@@ -15,7 +15,9 @@
  ******************************************************************************/
 package net.onrc.openvirtex.elements.datapath;
 
+import java.sql.Timestamp;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
@@ -50,7 +52,10 @@ public class PhysicalSwitch extends Switch<PhysicalPort> {
     private final XidTranslator<OVXSwitch> translator;
     private StatisticsManager statsMan = null;
     private AtomicReference<Map<Short, OVXPortStatisticsReply>> portStats;
+    private AtomicReference<Map<Short, OVXPortStatisticsReply>> lastPortStats;
     private AtomicReference<Map<Integer, List<OVXFlowStatisticsReply>>> flowStats;
+    private AtomicReference<Timestamp> curTs = null;
+    private long timeDelta = 0;
 
     /**
      * Unregisters OVXSwitches and associated virtual elements mapped to this
@@ -99,7 +104,11 @@ public class PhysicalSwitch extends Switch<PhysicalPort> {
         this.translator = new XidTranslator<OVXSwitch>();
         this.portStats = new AtomicReference<Map<Short, OVXPortStatisticsReply>>();
         this.flowStats = new AtomicReference<Map<Integer, List<OVXFlowStatisticsReply>>>();
+//        this.portBwStats = new AtomicReference<Map<Short, Double>>(); //in Bps
+        this.lastPortStats = new AtomicReference<Map<Short, OVXPortStatisticsReply>>();
         this.statsMan = new StatisticsManager(this);
+        this.curTs  = new AtomicReference<Timestamp>();
+        this.curTs.set(new Timestamp(System.currentTimeMillis()));
     }
 
     /**
@@ -271,7 +280,11 @@ public class PhysicalSwitch extends Switch<PhysicalPort> {
     }
 
     public void setPortStatistics(Map<Short, OVXPortStatisticsReply> stats) {
+        this.lastPortStats.set(this.portStats.get());
         this.portStats.set(stats);
+
+        Timestamp lastTs = this.curTs.getAndSet(new Timestamp(System.currentTimeMillis()));
+        this.timeDelta = this.curTs.get().getTime() - lastTs.getTime();
     }
 
     public void setFlowStatistics(
@@ -344,4 +357,14 @@ public class PhysicalSwitch extends Switch<PhysicalPort> {
 
     }
 
+    public double getPortBw(short portNumber) {
+        Map<Short, OVXPortStatisticsReply> stats = this.portStats.get();
+        Map<Short, OVXPortStatisticsReply> lastStats = this.lastPortStats.get();
+
+        if (stats == null || lastStats == null)
+            return (double)-1;
+        else
+            return (double) ((stats.get(portNumber).getTransmitBytes() -
+                lastStats.get(portNumber).getTransmitBytes()) / this.timeDelta * 1000 * 8);
+    }
 }
