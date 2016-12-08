@@ -21,7 +21,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import jdk.nashorn.internal.objects.Global;
 import net.onrc.openvirtex.api.server.JettyServer;
 import net.onrc.openvirtex.core.cmd.CmdLineSettings;
 import net.onrc.openvirtex.core.io.ClientChannelPipeline;
